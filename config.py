@@ -6,7 +6,7 @@ class Config:
 
     SECRET_KEY = '8v3c8SCjBJLIF1zEqW7DfxPRK5gF9iZeaBhia8qVxqpr88KOoCzUJrbpSLg1'
 
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@loclhost/flask_project2'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@localhost/flask_project2'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     SESSION_TYPE = 'redis'

@@ -8,7 +8,8 @@ class Config:
 
     SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@localhost/flask_project2'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
+    REDIS_HOST = '127.0.0.1'
+    REDIS_PORT = 6379
     SESSION_TYPE = 'redis'
     SESSION_REDIS = StrictRedis(host='127.0.0.1', port=6379)
     SESSION_USE_SIGNER = True

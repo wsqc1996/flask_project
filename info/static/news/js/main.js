@@ -93,7 +93,7 @@ $(function(){
 		$(this).find('a')[0].click()
 	})
 
-    // TODO 登录表单提交
+    // 登录表单提交
     $(".login_form_con").submit(function (e) {
         e.preventDefault()
         var mobile = $(".login_form #mobile").val()
@@ -110,10 +110,31 @@ $(function(){
         }
 
         // 发起登录请求
+        var params = {
+            'mobile':mobile,
+            'password':password
+        }
+
+        $.ajax({
+            url:'/login',
+            type:'post',
+            data:JSON.stringify(params),
+            contentType:'application/json',
+             headers:{
+                'X-CSRFToken':getCookie('csrf_token')
+            },
+            success:function (resp) {
+                if(resp.errno == '0'){
+                    location.reload()
+                }else {
+                    alert(resp.errmsg)
+                }
+            }
+        })
     })
 
 
-    // TODO 注册按钮点击
+    // 注册按钮点击
     $(".register_form_con").submit(function (e) {
         // 阻止默认提交操作
         e.preventDefault()
@@ -144,14 +165,38 @@ $(function(){
         }
 
         // 发起注册请求
+        var params = {
+            'mobile':mobile,
+            'sms_code':smscode,
+            'password':password
+        }
 
+        $.ajax({
+            url:'/register',
+            type:'post',
+            data:JSON.stringify(params),
+            contentType:'application/json',
+            headers:{
+                'X-CSRFToken':getCookie('csrf_token')
+            },
+            success:function (resp) {
+                if(resp.errno == '0'){
+                    location.reload()
+                }else {
+                    alert(resp.errmsg)
+                }
+            }
+        })
     })
 })
 
 var imageCodeId = ""
 
-// TODO 生成一个图片验证码的编号，并设置页面中图片验证码img标签的src属性
+//  生成一个图片验证码的编号，并设置页面中图片验证码img标签的src属性
 function generateImageCode() {
+    imageCodeId = generateUUID();
+    var url = '/image_code?image_code_id=' + imageCodeId
+    $('.get_pic_code').attr('src', url);
 
 }
 
@@ -174,7 +219,39 @@ function sendSMSCode() {
         return;
     }
 
-    // TODO 发送短信验证码
+    // 发送短信验证码
+    var params = {
+        'mobile':mobile,
+        'image_code':imageCode,
+        'image_code_id':imageCodeId
+    }
+    $.ajax({
+        url:'/sms_code',
+        type:'post',
+        data:JSON.stringify(params),
+        contentType:'application/json',
+        headers:{
+                'X-CSRFToken':getCookie('csrf_token')
+            },
+        success:function (resp) {
+            if (resp.errno == '0'){
+                var num = 60;
+                var t = setInterval(function () {
+                    if(num == 0){
+                        clearInterval(t);
+                        $('.get_code').attr('onclick','sendSMSCode()')
+                        $('.get_code').html('点击获取验证码')
+                    }else{
+                        num -= 1
+                        $('.get_code').html('还剩' + num + '秒')
+                    }
+                },1000)
+            }else {
+                alert(resp.errmsg)
+            }
+        }
+
+    })
 }
 
 // 调用该函数模拟点击左侧按钮
@@ -210,4 +287,10 @@ function generateUUID() {
         return (c=='x' ? r : (r&0x3|0x8)).toString(16);
     });
     return uuid;
+}
+
+function logout() {
+    $.get('/logout',function (resp) {
+        location.reload()
+    })
 }
